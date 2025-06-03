@@ -41,7 +41,12 @@
             font-weight: bold;
             color: #555555;
         }
-        input {
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input, select {
             width: 100%;
             padding: 10px;
             margin: 10px 0 20px;
@@ -89,11 +94,29 @@
         <div class="form-section">
             <h1>Mining Income Calculator</h1>
 
-            <label for="userHashrate">Your Hashrate (H/s)</label>
-            <input type="number" id="userHashrate" placeholder="Enter your hashrate">
+            <label for="userHashrate">Your Hashrate</label>
+            <div class="input-group">
+                <input type="number" id="userHashrate" placeholder="Enter your hashrate">
+                <select id="userUnit">
+                    <option value="1">H/s</option>
+                    <option value="1000">KH/s</option>
+                    <option value="1000000">MH/s</option>
+                    <option value="1000000000">GH/s</option>
+                    <option value="1000000000000">TH/s</option>
+                </select>
+            </div>
 
-            <label for="networkHashrate">Network Hashrate (H/s)</label>
-            <input type="number" id="networkHashrate" placeholder="Enter network hashrate">
+            <label for="networkHashrate">Network Hashrate</label>
+            <div class="input-group">
+                <input type="number" id="networkHashrate" placeholder="Enter network hashrate">
+                <select id="networkUnit">
+                    <option value="1">H/s</option>
+                    <option value="1000">KH/s</option>
+                    <option value="1000000">MH/s</option>
+                    <option value="1000000000">GH/s</option>
+                    <option value="1000000000000">TH/s</option>
+                </select>
+            </div>
 
             <label for="blockTime">Block Time (seconds)</label>
             <input type="number" id="blockTime" placeholder="Enter block time">
@@ -106,6 +129,7 @@
 
             <button onclick="calculateIncome()">Calculate</button>
         </div>
+
         <div class="results-section">
             <h2>Rewards</h2>
             <table class="results-table">
@@ -156,7 +180,9 @@
     <script>
         function calculateIncome() {
             const userHashrate = parseFloat(document.getElementById('userHashrate').value);
+            const userUnit = parseFloat(document.getElementById('userUnit').value);
             const networkHashrate = parseFloat(document.getElementById('networkHashrate').value);
+            const networkUnit = parseFloat(document.getElementById('networkUnit').value);
             const blockTime = parseFloat(document.getElementById('blockTime').value);
             const blockReward = parseFloat(document.getElementById('blockReward').value);
             const usdPerCoin = parseFloat(document.getElementById('usdPerCoin').value);
@@ -167,12 +193,14 @@
                 return;
             }
 
+            const userHashrateH = userHashrate * userUnit;
+            const networkHashrateH = networkHashrate * networkUnit;
+
             const secondsPerMinute = 60;
             const secondsPerHour = 3600;
             const secondsPerDay = 86400;
 
-            // Calculate rewards in coins
-            const rewardPerSecond = (userHashrate / networkHashrate) * (blockReward / blockTime);
+            const rewardPerSecond = (userHashrateH / networkHashrateH) * (blockReward / blockTime);
 
             const rewardPerMinute = rewardPerSecond * secondsPerMinute;
             const rewardPerHour = rewardPerSecond * secondsPerHour;
@@ -180,18 +208,17 @@
             const rewardPerWeek = rewardPerDay * 7;
             const rewardPerMonth = rewardPerDay * 30;
 
-            // Calculate rewards in USD
             const usdPerMinute = rewardPerMinute * usdPerCoin;
             const usdPerHour = rewardPerHour * usdPerCoin;
             const usdPerDay = rewardPerDay * usdPerCoin;
             const usdPerWeek = rewardPerWeek * usdPerCoin;
             const usdPerMonth = rewardPerMonth * usdPerCoin;
 
-            document.getElementById('minuteCoins').textContent = rewardPerMinute.toFixed(2);
-            document.getElementById('hourCoins').textContent = rewardPerHour.toFixed(2);
-            document.getElementById('dayCoins').textContent = rewardPerDay.toFixed(2);
-            document.getElementById('weekCoins').textContent = rewardPerWeek.toFixed(2);
-            document.getElementById('monthCoins').textContent = rewardPerMonth.toFixed(2);
+            document.getElementById('minuteCoins').textContent = rewardPerMinute.toFixed(6);
+            document.getElementById('hourCoins').textContent = rewardPerHour.toFixed(6);
+            document.getElementById('dayCoins').textContent = rewardPerDay.toFixed(6);
+            document.getElementById('weekCoins').textContent = rewardPerWeek.toFixed(6);
+            document.getElementById('monthCoins').textContent = rewardPerMonth.toFixed(6);
 
             document.getElementById('minuteUsd').textContent = `$${usdPerMinute.toFixed(2)}`;
             document.getElementById('hourUsd').textContent = `$${usdPerHour.toFixed(2)}`;
